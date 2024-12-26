@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseEntity {
+public class ResponseMessage {
     private String message;
     private boolean status;
 }
