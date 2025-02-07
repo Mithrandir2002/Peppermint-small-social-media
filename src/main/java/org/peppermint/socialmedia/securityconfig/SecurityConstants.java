@@ -1,6 +1,8 @@
-package org.peppermint.socialmedia.config;
+package org.peppermint.socialmedia.securityconfig;
 
-public class SecurityConstant {
+public class SecurityConstants {
+    public static final String BEARER = "Bearer ";
     public static String JWT_HEADER = "Authorization";
     public static String SECRET_KEY = "5b932d5271cda45deacf23d77bf1507a6e98fbd1b65c16e71abd4a64c986183bbcac48d94ffff314e7260ea90e20e80a1666b39e6d8594c32dc36b42344c47cd58678d19e85aacff42150d7336fcac1024fe89a52f7765c9a036b34efba3d9618775e265318b5a2bb28765e865f52171750d94e0ee4bfbb760b8fa24cb70a676e6b3bc69bd0da9c5061007efd1fb8cdf815d1de3548378304b9162e24d9f2c8988a155821f46b538f38205adf7e801b5f7d1ee452eb7b0ec3d36e0f5d068796455f8336dc26f87e67231cf77ddb3d62d2df4fb0e031f2f94e206ad71dbf1040208ab49246043373915fef6b29b92e0b4d2cd64c9a256addc88b9992dfa0f3d47";
+    public static final int TOKEN_EXPIRATION = 7200000;
 }

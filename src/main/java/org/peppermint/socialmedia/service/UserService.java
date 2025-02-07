@@ -15,4 +15,7 @@ public interface UserService {
     public List<User> searchUser(String query);
     public User savedPost(User user);
     User findUserByJwt(String jwt);
+    public List<User> getFollower(Integer id);
+    public List<User> getFollowing(Integer id);
+    public List<Post> getSavedPost(Integer id);
 }

@@ -8,37 +8,22 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Comment {
+public class Story {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String content;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToMany
-    @JoinTable(
-            name = "liked_comment",
-            joinColumns = @JoinColumn(name = "comment"),
-            inverseJoinColumns = @JoinColumn(name = "user")
-    )
-    private List<User> liked = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
-
+    private String image;
+    private String caption;
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

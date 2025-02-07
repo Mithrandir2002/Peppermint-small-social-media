@@ -1,6 +1,7 @@
 package org.peppermint.socialmedia.controller;
 
 import lombok.AllArgsConstructor;
+import org.peppermint.socialmedia.model.Post;
 import org.peppermint.socialmedia.model.User;
 import org.peppermint.socialmedia.repository.UserRepository;
 import org.peppermint.socialmedia.response.AuthResponse;
@@ -34,6 +35,16 @@ public class UserController {
         return userService.followUser(reqUser.getId(), userId2);
     }
 
+    @GetMapping("api/users/follower/{userId}")
+    public List<User> getFollowers(@PathVariable Integer userId) {
+        return userService.getFollower(userId);
+    }
+
+    @GetMapping("api/users/following/{userId}")
+    public List<User> getFollowings(@PathVariable Integer userId) {
+        return userService.getFollowing(userId);
+    }
+
     @GetMapping("/api/users/search")
     public List<User> searchUser(@RequestParam("query") String query) {
         return userService.searchUser(query);
@@ -59,5 +70,11 @@ public class UserController {
     public User getUserFromToken(@RequestHeader("Authorization") String jwt) {
         User user = userService.findUserByJwt(jwt);
         return user;
+    }
+
+    @GetMapping("/api/users/savedPost")
+    public List<Post> getSavedPost(@RequestHeader("Authorization") String jwt) {
+        User user = userService.findUserByJwt(jwt);
+        return userService.getSavedPost(user.getId());  
     }
 }

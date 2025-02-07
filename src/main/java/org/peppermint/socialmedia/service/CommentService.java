@@ -6,4 +6,5 @@ public interface CommentService {
     public Comment createComment(Comment comment, Integer postId, Integer userId);
     public Comment findCommentById(Integer commentId);
     public Comment likeComment(Integer commentId, Integer userId);
+    public Comment updateComment(Comment comment, Integer cmtId, Integer userId);
 }

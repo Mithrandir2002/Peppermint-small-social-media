@@ -1,6 +1,9 @@
 package org.peppermint.socialmedia.service;
 
 import org.peppermint.socialmedia.model.Post;
+import org.peppermint.socialmedia.model.PostDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -12,4 +15,7 @@ public interface PostService {
     List<Post> findAllPost();
     Post savedPost(Integer postId, Integer userId);
     Post likePost(Integer postId, Integer userId);
+    Post updatePost(Post post, Integer postId, Integer userId);
+
+    Page<PostDTO> getPostsPage(PageRequest of);
 }

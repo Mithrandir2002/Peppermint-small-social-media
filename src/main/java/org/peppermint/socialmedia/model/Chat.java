@@ -1,6 +1,5 @@
 package org.peppermint.socialmedia.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,38 +11,29 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-public class Post {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Chat {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String caption;
-    private String image;
-    private String video;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private String chatName;
 
-    @JsonIgnore
     @ManyToMany
     @JoinTable(
-            name = "liked_post",
-            joinColumns = @JoinColumn(name = "post"),
+            name = "users-chat",
+            joinColumns = @JoinColumn(name = "chat"),
             inverseJoinColumns = @JoinColumn(name = "user")
     )
-    private List<User> liked = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "savedPost")
     private List<User> users = new ArrayList<>();
 
+    @OneToMany(mappedBy = "chat")
+    private List<Message> messages = new ArrayList<>();
+
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDateTime timestamp;
 }

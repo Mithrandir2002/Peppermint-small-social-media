@@ -16,17 +16,21 @@ import java.util.Optional;
 public class CommentServiceImpl implements CommentService{
     @Autowired
     CommentRepository commentRepository;
+    @Autowired
     UserService userService;
+    @Autowired
     PostService postService;
+    @Autowired
     PostRepository postRepository;
     @Override
     public Comment createComment(Comment comment, Integer postId, Integer userId) {
         User user = userService.findUserById(userId);
         Post post = postService.findPostById(postId);
         comment.setUser(user);
-        post.getComments().add(comment);
+        Comment savedComment = commentRepository.save(comment);
+        post.getComments().add(savedComment);
         postRepository.save(post);
-        return commentRepository.save(comment);
+        return savedComment;
     }
 
     @Override
@@ -41,6 +45,15 @@ public class CommentServiceImpl implements CommentService{
         if (!comment.getLiked().contains(user)) comment.getLiked().add(user);
         else comment.getLiked().remove(user);
         return commentRepository.save(comment);
+    }
+
+    @Override
+    public Comment updateComment(Comment comment, Integer cmtId, Integer userId) {
+        User user = userService.findUserById(userId);
+        Comment updatedComment = findCommentById(cmtId);
+        if (!user.getComments().contains(updatedComment)) throw new RuntimeException();
+        if (comment.getContent() != null) updatedComment.setContent(comment.getContent());
+        return commentRepository.save(updatedComment);
     }
 
     public Comment unwrapComment(Optional<Comment> optionalComment, Integer commentId) {
