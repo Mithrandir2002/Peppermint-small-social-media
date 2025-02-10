@@ -7,6 +7,8 @@ import org.peppermint.socialmedia.repository.UserRepository;
 import org.peppermint.socialmedia.response.AuthResponse;
 import org.peppermint.socialmedia.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -22,6 +24,12 @@ public class UserController {
     @GetMapping("/users")
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    @GetMapping("/api/user/usersid")
+    public ResponseEntity<Integer> getUserId(@RequestHeader("Authorization") String jwt) {
+        User user = userService.findUserByJwt(jwt);
+        return new ResponseEntity<>(user.getId(), HttpStatus.OK);
     }
 
     @GetMapping("/api/users/{userId}")
