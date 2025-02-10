@@ -26,7 +26,7 @@ public class MessageServiceImpl implements MessageService{
                 .chat(chat)
                 .content(message.getContent())
                 .image(message.getImage())
-                .user(message.getUser())
+                .user(user)
                 .build();
         messageRepository.save(createdMsg);
         chat.getMessages().add(createdMsg);
