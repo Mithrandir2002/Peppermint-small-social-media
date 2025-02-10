@@ -2,13 +2,17 @@ package org.peppermint.socialmedia.service;
 
 import org.peppermint.socialmedia.exception.EntityNotFoundException;
 import org.peppermint.socialmedia.exception.UnauthorizedException;
+import org.peppermint.socialmedia.model.Comment;
 import org.peppermint.socialmedia.model.Post;
 import org.peppermint.socialmedia.model.PostDTO;
 import org.peppermint.socialmedia.model.User;
+import org.peppermint.socialmedia.repository.CommentRepository;
 import org.peppermint.socialmedia.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +24,8 @@ public class PostServiceImpl implements PostService{
     PostRepository postRepository;
     @Autowired
     UserServiceImpl userService;
+    @Autowired
+    CommentRepository commentRepository;
     @Autowired
     BaseRedisService redisService;
     private static final String POST_CACHE_PREFIX = "post:";
@@ -39,26 +45,39 @@ public class PostServiceImpl implements PostService{
             throw new UnauthorizedException("User does not own this post.");
         } else {
             postRepository.delete(post);
-//            redisService.delete(cacheKey);
+            redisService.delete(cacheKey);
             return "Sucessfully deleted post";
         }
     }
 
     @Override
     public List<Post> findPostByUserId(Integer userId) {
-        return postRepository.findPostByUserId(userId);
+        return null;
     }
 
     @Override
     public Post findPostById(Integer postId) {
-//        String cacheKey = POST_CACHE_PREFIX + postId;
-//        Post cachedPost = (Post) redisService.get(cacheKey);
+        String cacheKey = POST_CACHE_PREFIX + postId;
+        Post cachedPost = (Post) redisService.get(cacheKey, Post.class);
+        if (cachedPost != null) return cachedPost;
+        Post post = unwrapPost(postId, postRepository.findById(postId));
+        redisService.set(cacheKey, post);
+        redisService.setTimeToLive(cacheKey, 1);
+        return post;
+    }
+
+    @Override
+    public PostDTO findPostDTOById(Integer postId) {
+        String cacheKey = POST_CACHE_PREFIX + postId;
+//        PostDTO cachedPost = (PostDTO) redisService.get(cacheKey, PostDTO.class);
 //        if (cachedPost != null) return cachedPost;
         Post post = unwrapPost(postId, postRepository.findById(postId));
+        PostDTO postDTO = convertToPostDTO(post);
+        Page<Comment> comments = commentRepository.getCommentFromPostId(postId, PageRequest.of(0, 10, Sort.by("id")));
+        postDTO.setComments(comments);
 //        redisService.set(cacheKey, post);
 //        redisService.setTimeToLive(cacheKey, 1);
-        System.out.println(post.getComments().size());
-        return post;
+        return postDTO;
     }
 
     @Override
@@ -89,16 +108,16 @@ public class PostServiceImpl implements PostService{
     public Post updatePost(Post post, Integer postId, Integer userId) {
         User user = userService.findUserById(userId);
         Post updatedPost = findPostById(postId);
-        if (!updatedPost.getUser().equals(user)) throw new RuntimeException();
+        if (updatedPost.getUser().getId() != user.getId()) throw new RuntimeException();
         if (post.getCaption() != null) updatedPost.setCaption(post.getCaption());
         if (post.getImage() != null) updatedPost.setImage(post.getImage());
         if (post.getVideo() != null) updatedPost.setVideo(post.getVideo());
 
         Post savedPost = postRepository.save(updatedPost);
 
-//        String cacheKey = POST_CACHE_PREFIX + postId;
-//        redisService.set(cacheKey, updatedPost);
-//        redisService.setTimeToLive(cacheKey, 1);
+        String cacheKey = POST_CACHE_PREFIX + postId;
+        redisService.set(cacheKey, updatedPost);
+        redisService.setTimeToLive(cacheKey, 1);
 
         return savedPost;
     }
@@ -106,6 +125,12 @@ public class PostServiceImpl implements PostService{
     @Override
     public Page<PostDTO> getPostsPage(PageRequest of) {
         Page<Post> posts = postRepository.findAll(of);
+        return posts.map(post -> convertToPostDTO(post));
+    }
+
+    @Override
+    public Page<PostDTO> findPostByIdPage(Integer userId, PageRequest of) {
+        Page<Post> posts = postRepository.findPostByUserId(userId, of);
         return posts.map(post -> convertToPostDTO(post));
     }
 

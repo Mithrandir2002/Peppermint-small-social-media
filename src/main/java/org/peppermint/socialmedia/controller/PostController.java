@@ -40,13 +40,19 @@ public class PostController {
     }
 
     @GetMapping("/api/posts/{postId}")
-    public ResponseEntity<Post> findPostById(@PathVariable("postId") Integer postId) {
-        return new ResponseEntity<>(postService.findPostById(postId), HttpStatus.OK);
+    public ResponseEntity<PostDTO> findPostById(@PathVariable("postId") Integer postId) {
+        return new ResponseEntity<>(postService.findPostDTOById(postId), HttpStatus.OK);
     }
 
     @GetMapping("/api/posts/user/{userId}")
-    public ResponseEntity<List<Post>> findUserPosts(@PathVariable Integer userId) {
-        return new ResponseEntity<>(postService.findPostByUserId(userId), HttpStatus.OK);
+    public ResponseEntity<Page<PostDTO>> findUserPosts(@PathVariable Integer userId,
+                                                    @RequestParam(value = "offset", required = false) Integer offset,
+                                                    @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                                    @RequestParam(value = "sortBy", required = false) String sortBy) {
+        if (offset == null) offset = 0;
+        if (pageSize == null) offset = 0;
+        if (sortBy.equals("")) sortBy = "id";
+        return new ResponseEntity<>(postService.findPostByIdPage(userId, PageRequest.of(offset, pageSize, Sort.by(sortBy))), HttpStatus.OK);
     }
 
 //    @GetMapping("/api/posts")
