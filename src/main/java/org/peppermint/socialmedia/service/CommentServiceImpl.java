@@ -7,6 +7,8 @@ import org.peppermint.socialmedia.model.User;
 import org.peppermint.socialmedia.repository.CommentRepository;
 import org.peppermint.socialmedia.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,6 +29,7 @@ public class CommentServiceImpl implements CommentService{
         User user = userService.findUserById(userId);
         Post post = postService.findPostById(postId);
         comment.setUser(user);
+        comment.setPost(post);
         Comment savedComment = commentRepository.save(comment);
         post.getComments().add(savedComment);
         postRepository.save(post);
@@ -54,6 +57,11 @@ public class CommentServiceImpl implements CommentService{
         if (!user.getComments().contains(updatedComment)) throw new RuntimeException();
         if (comment.getContent() != null) updatedComment.setContent(comment.getContent());
         return commentRepository.save(updatedComment);
+    }
+
+    @Override
+    public Page<Comment> pageableCommentbyPostId(Integer postId, Pageable of) {
+        return commentRepository.getCommentFromPostId(postId, of);
     }
 
     public Comment unwrapComment(Optional<Comment> optionalComment, Integer commentId) {
