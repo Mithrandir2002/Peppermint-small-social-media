@@ -9,7 +9,7 @@ public interface BaseRedisService {
     void setTimeToLive(String key, long timeoutInDays);
     void hashSet(String key, String field, Object value);
     boolean hashExists(String key, String field);
-    Object get(String key);
+    <T> T get(String key, Class<T> type);
     public Map<String ,Object> getField(String key);
     Object hashGet(String key, String field);
     List<Object> hashGetByFieldPrefix(String key, String fieldPrefix);

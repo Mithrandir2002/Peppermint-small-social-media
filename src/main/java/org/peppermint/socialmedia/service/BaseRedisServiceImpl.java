@@ -1,5 +1,7 @@
 package org.peppermint.socialmedia.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -42,8 +44,11 @@ public class BaseRedisServiceImpl implements BaseRedisService{
     }
 
     @Override
-    public Object get(String key) {
-        return redisTemplate.opsForValue().get(key);
+    public <T> T get(String key, Class<T> type) {
+        Object obj = redisTemplate.opsForValue().get(key);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper.convertValue(obj, type);
     }
 
     @Override
